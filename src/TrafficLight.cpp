@@ -72,10 +72,9 @@ void TrafficLight::cycleThroughPhases()
     while (true)
     {
         auto current = std::chrono::high_resolution_clock::now();
-        auto duration = (current - prev).count();
-        prev = current;
+        auto duration = std::chrono::duration_cast<std::chrono::seconds>(current - prev);
         unsigned r = (rand() % (6 - 4 + 1)) + 4;
-        if (duration >= r)
+        if (duration.count() >= r)
         {
             _currentPhase = getCurrentPhase();
             switch (_currentPhase)
@@ -88,6 +87,7 @@ void TrafficLight::cycleThroughPhases()
                 break;
             }
             msgQueue.send(std::move(_currentPhase));
+            prev = current;
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
